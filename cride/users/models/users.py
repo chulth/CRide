@@ -2,11 +2,14 @@
 
 # import models
 '''This model heredity of abstracuser in django/templates/models '''
-from django.db import models
-from django.contrib.auth.models import AbstractUser
-
 # utilities
 from cride.utils.models import CRideModel
+from django.db import models
+from django.contrib.auth.models import AbstractUser
+from django.core.validators import RegexValidator
+
+
+
 
 class User(CRideModel,AbstractUser):
     '''User model.
@@ -20,7 +23,11 @@ class User(CRideModel,AbstractUser):
             'unique': 'A user is with that email already exists.'
         }
     )
-    phone_number = models.CharField(max_length=17, blank=True)
+    phone_regex = RegexValidator(
+        regex= r'\+?1?\d{9,15}$',
+        message='Phone number must be entered in the  format: +99999999999. up to 15 digitis allowed.'
+    )
+    phone_number = models.CharField(validators =[phone_regex], max_length=17, blank=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', 'first_name', 'lastname']
@@ -41,3 +48,11 @@ class User(CRideModel,AbstractUser):
             'Set to true when the user havevirified it s mail address'
         )
     )
+
+    def __str__(self):
+        '''Return username.'''
+        return  self.username
+
+    def get_short_name(self):
+        '''Return username.'''
+        return self.username
